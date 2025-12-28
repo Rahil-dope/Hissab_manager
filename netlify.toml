@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build:css"
+  publish = "public"
+
+[dev]
+  command = "npm run dev"
+  publish = "public"

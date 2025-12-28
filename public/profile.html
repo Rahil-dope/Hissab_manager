@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Student Expense Tracker</title>
+    <link href="/css/style.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+
+<!-- Added id="bodyTheme" and transition class -->
+
+<body
+    class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex h-screen overflow-hidden font-sans transition-colors duration-500"
+    id="bodyTheme">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-20 hidden lg:hidden"></div>
+
+    <aside id="sidebar"
+        class="fixed lg:static inset-y-0 left-0 w-72 bg-white/80 backdrop-blur-md border-r border-white/40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-30 flex flex-col shadow-xl lg:shadow-none">
+        <div class="p-6 flex items-center justify-between">
+            <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-800">
+                <div
+                    class="w-10 h-10 rounded-xl bg-primary-600 text-white flex items-center justify-center shadow-lg shadow-primary-500/30">
+                    <i data-feather="pie-chart" class="w-6 h-6"></i>
+                </div>
+                <span class="tracking-tight">ExpenseTk</span>
+            </h1>
+            <button class="lg:hidden p-2 hover:bg-slate-100 rounded-full" id="closeSidebar">
+                <i data-feather="x" class="text-slate-500"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Main Menu</p>
+            <a href="/dashboard.html" class="nav-link">
+                <i data-feather="grid" class="w-5 h-5"></i>
+                Dashboard
+            </a>
+            <a href="/expenses.html" class="nav-link">
+                <i data-feather="list" class="w-5 h-5"></i>
+                Expenses
+            </a>
+            <a href="/incomes.html" class="nav-link">
+                <i data-feather="dollar-sign" class="w-5 h-5"></i>
+                Incomes
+            </a>
+            <a href="/budgets.html" class="nav-link">
+                <i data-feather="target" class="w-5 h-5"></i>
+                Budgets
+            </a>
+
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mt-6 mb-3">Analytics & Settings
+            </p>
+            <a href="/categories.html" class="nav-link">
+                <i data-feather="tag" class="w-5 h-5"></i>
+                Categories
+            </a>
+            <a href="/reports.html" class="nav-link">
+                <i data-feather="bar-chart-2" class="w-5 h-5"></i>
+                Reports
+            </a>
+            <a href="/profile.html" class="nav-link active">
+                <i data-feather="user" class="w-5 h-5"></i>
+                Profile
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-100/50">
+            <div class="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-slate-50 border border-slate-100">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
+                    <i data-feather="user" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-900" id="userDisplay">User</p>
+                    <p class="text-xs text-slate-500">Student Plan</p>
+                </div>
+            </div>
+            <a href="#" id="logoutBtn"
+                class="flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium transition-colors mt-2">
+                <i data-feather="log-out" class="w-4 h-4"></i>
+                Sign Out
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+        <!-- Decorative bg blur -->
+        <div class="absolute top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+            <div class="absolute top-[-5%] right-[-5%] w-[30%] h-[30%] bg-blue-400/10 rounded-full blur-[80px]"></div>
+            <div class="absolute bottom-[20%] left-[10%] w-[20%] h-[20%] bg-purple-400/10 rounded-full blur-[80px]">
+            </div>
+        </div>
+
+        <div
+            class="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-white/40 flex items-center justify-between px-4 z-20">
+            <button id="menuBtn" class="p-2 text-slate-600"><i data-feather="menu"></i></button>
+            <h1 class="font-bold text-slate-900">Profile</h1>
+            <div class="w-8"></div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 lg:p-10 relative z-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto space-y-8">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900 tracking-tight dark:text-white">Your Profile</h2>
+                    <p class="text-slate-500 mt-1 dark:text-slate-400">Manage your account settings and preferences.</p>
+                </div>
+
+                <!-- Profile Card -->
+                <div
+                    class="card bg-white/60 backdrop-blur-xl border border-white/50 shadow-lg flex flex-col items-center p-10 text-center dark:bg-slate-800/60 dark:border-slate-700">
+                    <div class="relative mb-6">
+                        <div
+                            class="w-32 h-32 bg-gradient-to-br from-primary-100 to-indigo-100 rounded-full flex items-center justify-center text-primary-600 shadow-inner">
+                            <i data-feather="user" class="w-14 h-14"></i>
+                        </div>
+                        <div
+                            class="absolute bottom-0 right-0 w-10 h-10 bg-primary-600 text-white rounded-full flex items-center justify-center border-4 border-white shadow-md dark:border-slate-800">
+                            <i data-feather="edit-2" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+
+                    <h2 class="text-3xl font-bold text-slate-900 mb-1 dark:text-white" id="profileName">User Name</h2>
+                    <p
+                        class="text-slate-500 font-medium bg-slate-100 px-4 py-1.5 rounded-full text-sm dark:bg-slate-700 dark:text-slate-300">
+                        Student Account
+                    </p>
+                </div>
+
+                <!-- Settings -->
+                <div
+                    class="card bg-white/60 backdrop-blur-xl border border-white/50 shadow-lg dark:bg-slate-800/60 dark:border-slate-700">
+                    <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 dark:text-white">
+                        <i data-feather="settings" class="w-5 h-5 text-slate-400"></i>
+                        Preferences
+                    </h3>
+                    <form id="settingsForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2 dark:text-slate-300">Display
+                                Name</label>
+                            <input type="text" name="username" required
+                                class="input dark:bg-slate-700 dark:border-slate-600 dark:text-white"
+                                placeholder="Your Name">
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-slate-700 mb-2 dark:text-slate-300">Currency</label>
+                            <select name="currency"
+                                class="input dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                                <option value="INR">INR (₹) - Indian Rupee</option>
+                            </select>
+                            <p class="text-xs text-slate-500 mt-1 dark:text-slate-400">Currency is restricted to local
+                                regulation (INR Only).</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2 dark:text-slate-300">App
+                                Theme</label>
+                            <select name="theme" class="input dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                                <option value="colorful">Colorful (Default)</option>
+                                <option value="light">Light Mode</option>
+                                <option value="dark">Dark Mode</option>
+                            </select>
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit"
+                                class="btn btn-primary w-full sm:w-auto px-8 py-3 shadow-glow hover:shadow-glow-hover">Save
+                                Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="/js/app.js"></script>
+    <script src="/js/profile.js"></script>
+</body>
+
+</html>

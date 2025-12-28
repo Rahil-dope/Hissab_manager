@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - Student Expense Tracker</title>
+    <link href="/css/style.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+
+<body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex h-screen overflow-hidden font-sans">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-20 hidden lg:hidden"></div>
+
+    <aside id="sidebar"
+        class="fixed lg:static inset-y-0 left-0 w-72 bg-white/80 backdrop-blur-md border-r border-white/40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out z-30 flex flex-col shadow-xl lg:shadow-none">
+        <div class="p-6 flex items-center justify-between">
+            <h1 class="text-2xl font-bold flex items-center gap-3 text-slate-800">
+                <div
+                    class="w-10 h-10 rounded-xl bg-primary-600 text-white flex items-center justify-center shadow-lg shadow-primary-500/30">
+                    <i data-feather="pie-chart" class="w-6 h-6"></i>
+                </div>
+                <span class="tracking-tight">ExpenseTk</span>
+            </h1>
+            <button class="lg:hidden p-2 hover:bg-slate-100 rounded-full" id="closeSidebar">
+                <i data-feather="x" class="text-slate-500"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Main Menu</p>
+            <a href="/dashboard.html" class="nav-link">
+                <i data-feather="grid" class="w-5 h-5"></i>
+                Dashboard
+            </a>
+            <a href="/expenses.html" class="nav-link">
+                <i data-feather="list" class="w-5 h-5"></i>
+                Expenses
+            </a>
+            <a href="/incomes.html" class="nav-link">
+                <i data-feather="dollar-sign" class="w-5 h-5"></i>
+                Incomes
+            </a>
+            <a href="/budgets.html" class="nav-link">
+                <i data-feather="target" class="w-5 h-5"></i>
+                Budgets
+            </a>
+
+            <p class="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mt-6 mb-3">Analytics & Settings
+            </p>
+            <a href="/categories.html" class="nav-link active">
+                <i data-feather="tag" class="w-5 h-5"></i>
+                Categories
+            </a>
+            <a href="/reports.html" class="nav-link">
+                <i data-feather="bar-chart-2" class="w-5 h-5"></i>
+                Reports
+            </a>
+            <a href="/profile.html" class="nav-link">
+                <i data-feather="user" class="w-5 h-5"></i>
+                Profile
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-100/50">
+            <div class="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl bg-slate-50 border border-slate-100">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
+                    <i data-feather="user" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-900" id="userDisplay">User</p>
+                    <p class="text-xs text-slate-500">Student Plan</p>
+                </div>
+            </div>
+            <a href="#" id="logoutBtn"
+                class="flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium transition-colors mt-2">
+                <i data-feather="log-out" class="w-4 h-4"></i>
+                Sign Out
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+        <!-- Decorative bg blur -->
+        <div class="absolute top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+            <div class="absolute top-[-5%] right-[-5%] w-[30%] h-[30%] bg-blue-400/10 rounded-full blur-[80px]"></div>
+            <div class="absolute bottom-[20%] left-[10%] w-[20%] h-[20%] bg-purple-400/10 rounded-full blur-[80px]">
+            </div>
+        </div>
+
+        <div
+            class="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-white/40 flex items-center justify-between px-4 z-20">
+            <button id="menuBtn" class="p-2 text-slate-600"><i data-feather="menu"></i></button>
+            <h1 class="font-bold text-slate-900">Categories</h1>
+            <div class="w-8"></div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 lg:p-10 relative z-10 scroll-smooth">
+            <div class="max-w-2xl mx-auto space-y-8">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900 tracking-tight">Categories</h2>
+                    <p class="text-slate-500 mt-1">Organize your expenses with custom categories.</p>
+                </div>
+
+                <!-- Add Category -->
+                <div class="card bg-white/60 backdrop-blur-xl border border-white/50 shadow-lg">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4">Add New Category</h2>
+                    <form id="categoryForm" class="flex flex-col sm:flex-row gap-4">
+                        <input type="text" name="name" required class="input flex-1"
+                            placeholder="Category Name (e.g. Books)">
+                        <button type="submit"
+                            class="btn btn-primary whitespace-nowrap px-6 shadow-glow hover:shadow-glow-hover">Add
+                            Category</button>
+                    </form>
+                </div>
+
+                <!-- Category List -->
+                <div class="bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+                        <h3 class="font-semibold text-slate-700">Existing Categories</h3>
+                    </div>
+                    <ul id="categoryList" class="divide-y divide-slate-100">
+                        <!-- Items here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const list = document.getElementById('categoryList');
+            const form = document.getElementById('categoryForm');
+
+            loadCategories();
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = form.name.value;
+                try {
+                    const res = await fetch('/categories', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                    if (res.ok) {
+                        form.reset();
+                        loadCategories();
+                    }
+                } catch (err) { alert('Error adding category'); }
+            });
+
+            async function loadCategories() {
+                try {
+                    const res = await fetch('/categories');
+                    const categories = await res.json();
+
+                    list.innerHTML = categories.map(cat => `
+                        <li class="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
+                            <span class="font-medium text-slate-900 flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
+                                    <i data-feather="tag" class="w-4 h-4"></i>
+                                </div>
+                                ${cat.name}
+                            </span>
+                            <button onclick="deleteCategory(${cat.id})" class="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-xl hover:bg-red-50">
+                                <i data-feather="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </li>
+                    `).join('');
+                    feather.replace();
+                } catch (err) { }
+            }
+
+            window.deleteCategory = async (id) => {
+                if (!confirm('Delete this category?')) return;
+                try {
+                    await fetch(`/categories/${id}`, { method: 'DELETE' });
+                    loadCategories();
+                } catch (err) { alert('Error deleting category'); }
+            };
+        });
+    </script>
+</body>
+
+</html>
