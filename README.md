@@ -58,20 +58,23 @@ A modern, full-stack expense tracking application designed for students. Manage 
 
 5.  Open your browser and visit `http://localhost:3000`.
 
-## 🌐 Deployment
+## 🌐 Deployment (Demo Mode)
 
-### Netlify (Frontend Only)
-This project includes a `netlify.toml` for easy deployment to Netlify.
+This project has been configured to run in **Demo Mode**, meaning it uses your browser's local storage instead of a backend database. This allows it to be hosted easily on static platforms like Netlify.
 
+### 🚀 Deploy to Netlify
 1.  **Drag and drop** this folder onto Netlify Drop, or connect your GitHub repository.
 2.  **Build Settings**:
     -   Build Command: `npm run build:css`
     -   Publish Directory: `public`
 
-**⚠️ Important**:
-Netlify is a static hosting service. Deploying there will host the **Frontend UI only**. Features requiring the backend (Login, Adding Data, Profiles) **will not work** because the Node.js server and SQLite database cannot run on standard Netlify hosting.
+**Note**: In Demo Mode, all data (users, expenses) is stored in your browser's `localStorage`. If you clear your cache or switch devices, your data will not be available.
 
-### Full Stack Deployment (Recommended)
+### Full Stack (Optional)
+To run with the real Node.js backend + SQLite:
+1.  Revert the frontend JS files to use API `fetch` calls.
+2.  Deploy to Render/Railway.
+
 To run the full application (Frontend + Backend + DB), deploy to a platform that supports Node.js and persistent storage:
 
 -   **Render / Railway / Heroku**:

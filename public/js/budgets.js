@@ -1,89 +1,105 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const budgetForm = document.getElementById('budgetForm');
-    const budgetMonth = document.getElementById('budgetMonth');
-    const categorySelect = document.getElementById('categorySelect');
     const budgetList = document.getElementById('budgetList');
+    const budgetForm = document.getElementById('budgetForm');
+    const categorySelect = document.getElementById('categorySelect');
+    const totalBudgetDisplay = document.getElementById('totalBudget');
+
+    let budgets = [];
+    let categories = [];
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
     // Init
-    const today = new Date();
-    budgetMonth.value = today.toISOString().slice(0, 7); // YYYY-MM
     loadCategories();
     loadBudgets();
 
-    budgetMonth.addEventListener('change', loadBudgets);
+    budgetForm.addEventListener('submit', handleFormSubmit);
 
-    budgetForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const data = {
-            category: budgetForm.category.value,
-            amount_limit: budgetForm.amount_limit.value,
-            month: budgetMonth.value
-        };
+    function loadCategories() {
+        const storedCategories = localStorage.getItem(`categories_${currentUser.id}`);
+        categories = storedCategories ? JSON.parse(storedCategories) : [];
+        if (categories.length === 0) {
+            categories = [{ id: 1, name: 'Food' }, { id: 2, name: 'Transport' }];
+        }
 
-        try {
-            const res = await fetch('/budgets', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
-                budgetForm.reset();
-                loadBudgets();
-            } else {
-                alert('Error setting budget');
-            }
-        } catch (err) { alert('Error setting budget'); }
-    });
-
-    async function loadCategories() {
-        const res = await fetch('/categories');
-        const cats = await res.json();
-        categorySelect.innerHTML = cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        categorySelect.innerHTML = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     }
 
-    async function loadBudgets() {
-        const month = budgetMonth.value;
-        if (!month) return;
+    function loadBudgets() {
+        const allBudgets = JSON.parse(localStorage.getItem('budgets') || '[]');
+        // Filter by user and current month (simplified for demo to just show all relevant to user)
+        budgets = allBudgets.filter(b => b.userId === currentUser.id);
 
-        const res = await fetch(`/budgets?month=${month}`);
-        const budgets = await res.json();
+        // Calculate totals
+        const total = budgets.reduce((sum, b) => sum + parseFloat(b.amount_limit), 0);
+        if (totalBudgetDisplay) totalBudgetDisplay.textContent = `Total Monthly Budget: ₹${total}`;
 
-        budgetList.innerHTML = budgets.map(b => {
-            const progressColor = b.percent > 100 ? 'bg-red-500' :
-                b.percent > 80 ? 'bg-yellow-500' : 'bg-green-500';
+        renderBudgets();
+    }
 
-            return `
-                <div class="card p-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <div>
-                            <h3 class="font-bold text-gray-900">${b.category}</h3>
-                            <p class="text-xs text-gray-500">${month}</p>
-                        </div>
-                        <div class="text-right">
-                             <span class="text-sm font-semibold text-gray-900">$${b.spent}</span>
-                             <span class="text-xs text-gray-500"> / $${b.amount_limit}</span>
-                        </div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                        <div class="${progressColor} h-2.5 rounded-full" style="width: ${Math.min(b.percent, 100)}%"></div>
-                    </div>
-                    <div class="flex justify-between mt-2 text-xs">
-                        <span class="${b.remaining < 0 ? 'text-red-600 font-bold' : 'text-gray-500'}">
-                            ${b.remaining < 0 ? `Over by $${Math.abs(b.remaining)}` : `$${b.remaining} left`}
-                        </span>
-                        <span>${b.percent}%</span>
-                    </div>
-                    <div class="mt-2 text-right">
-                        <button onclick="deleteBudget(${b.id})" class="text-red-500 text-xs hover:underline">Remove Budget</button>
-                    </div>
+    function renderBudgets() {
+        if (budgets.length === 0) {
+            budgetList.innerHTML = '<p class="text-gray-500 text-center col-span-full">No budgets set yet.</p>';
+            return;
+        }
+
+        budgetList.innerHTML = budgets.map(b => `
+            <div class="card p-6 flex flex-col justify-between group relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="deleteBudget(${b.id})" class="text-red-400 hover:text-red-600 p-1"><i data-feather="trash-2" class="w-4 h-4"></i></button>
                 </div>
-             `;
-        }).join('');
+                <div>
+                     <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-lg text-gray-800">${b.category}</h3>
+                        <span class="text-sm font-semibold text-primary-600 px-2 py-1 bg-primary-50 rounded-lg">₹${b.amount_limit}</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2.5 mb-1">
+                        <div class="bg-primary-500 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                     <p class="text-xs text-gray-400">Spent: ₹0 / ₹${b.amount_limit}</p>
+                </div>
+            </div>
+        `).join('');
+
+        if (typeof feather !== 'undefined') feather.replace();
     }
 
-    window.deleteBudget = async (id) => {
-        if (!confirm('Remove this budget?')) return;
-        await fetch(`/budgets/${id}`, { method: 'DELETE' });
+    window.deleteBudget = (id) => {
+        if (!confirm('Delete this budget?')) return;
+        const allBudgets = JSON.parse(localStorage.getItem('budgets') || '[]');
+        const updatedBudgets = allBudgets.filter(b => b.id !== id);
+        localStorage.setItem('budgets', JSON.stringify(updatedBudgets));
         loadBudgets();
     };
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const category = budgetForm.category.value;
+        const amount_limit = parseFloat(budgetForm.amount_limit.value);
+        const month = new Date().toISOString().slice(0, 7); // Current month
+
+        let allBudgets = JSON.parse(localStorage.getItem('budgets') || '[]');
+
+        // Check if exists for this month/category
+        const existingIndex = allBudgets.findIndex(b => b.userId === currentUser.id && b.category === category && b.month === month);
+
+        if (existingIndex !== -1) {
+            // Update
+            allBudgets[existingIndex].amount_limit = amount_limit;
+            alert('Budget updated for ' + category);
+        } else {
+            // Create
+            allBudgets.push({
+                id: Date.now(),
+                userId: currentUser.id,
+                category,
+                amount_limit,
+                month
+            });
+            alert('Budget set for ' + category);
+        }
+
+        localStorage.setItem('budgets', JSON.stringify(allBudgets));
+        budgetForm.reset();
+        loadBudgets();
+    }
 });

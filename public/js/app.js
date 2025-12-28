@@ -1,17 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Check Session (skip for login page)
-    if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
-        fetch('/auth/me')
-            .then(res => res.json())
-            .then(data => {
-                if (!data.isAuthenticated) {
-                    window.location.href = '/';
-                } else {
-                    const userDisplay = document.getElementById('userDisplay');
-                    if (userDisplay) userDisplay.textContent = data.username;
-                }
-            })
-            .catch(() => window.location.href = '/');
+    // Mock Session Check
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    const isAuthPage = window.location.pathname === '/' || window.location.pathname === '/index.html';
+
+    if (!currentUser && !isAuthPage) {
+        window.location.href = '/';
+    } else if (currentUser && isAuthPage) {
+        window.location.href = '/dashboard.html';
+    }
+
+    if (currentUser) {
+        const userDisplay = document.getElementById('userDisplay');
+        if (userDisplay) userDisplay.textContent = currentUser.username;
+        applyTheme(currentUser.theme || 'colorful');
     }
 
     // Sidebar Toggle (Mobile)
@@ -31,13 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Logout
+    // Mock Logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            fetch('/auth/logout', { method: 'POST' })
-                .then(() => window.location.href = '/');
+            localStorage.removeItem('currentUser');
+            window.location.href = '/';
         });
     }
 
@@ -46,10 +47,23 @@ document.addEventListener('DOMContentLoaded', () => {
         feather.replace();
     }
 
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('SW Registered'))
-            .catch(err => console.log('SW Failed', err));
+    function applyTheme(theme) {
+        const body = document.body;
+        // Reset classes
+        body.classList.remove('bg-gradient-to-br', 'from-indigo-50', 'via-white', 'to-purple-50');
+        body.classList.remove('bg-gray-50');
+        body.classList.remove('bg-gray-900', 'text-white');
+        document.documentElement.classList.remove('dark');
+
+        if (theme === 'colorful') {
+            body.classList.add('bg-gradient-to-br', 'from-indigo-50', 'via-white', 'to-purple-50');
+            body.classList.remove('text-white');
+        } else if (theme === 'light') {
+            body.classList.add('bg-gray-50');
+            body.classList.remove('text-white');
+        } else if (theme === 'dark') {
+            body.classList.add('bg-gray-900', 'text-white');
+            document.documentElement.classList.add('dark');
+        }
     }
 });

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadProfile();
 
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
         e.preventDefault();
         const data = {
             username: form.username.value,
@@ -13,35 +13,34 @@ document.addEventListener('DOMContentLoaded', () => {
             theme: form.theme.value
         };
 
-        try {
-            const res = await fetch('/user/profile', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
-                alert('Settings saved');
-                loadProfile(); // Reload to update displayed name and theme
-            } else {
-                alert('Failed to save settings');
-            }
-        } catch (err) { alert('Failed to save settings'); }
+        // Update Current User
+        let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        currentUser = { ...currentUser, ...data };
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        // Update User in Users Array
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
+        if (userIndex !== -1) {
+            users[userIndex] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        alert('Settings saved');
+        loadProfile(); // Apply changes
     });
 
-    async function loadProfile() {
-        try {
-            const res = await fetch('/user/profile');
-            const data = await res.json();
+    function loadProfile() {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser) return;
 
-            nameDisplay.textContent = data.username;
-            // Set form values
-            if (form.username) form.username.value = data.username;
-            if (data.currency) form.currency.value = data.currency;
-            if (data.theme) {
-                form.theme.value = data.theme;
-                applyTheme(data.theme);
-            }
-        } catch (err) { }
+        nameDisplay.textContent = currentUser.username;
+        if (form.username) form.username.value = currentUser.username;
+        if (currentUser.currency) form.currency.value = currentUser.currency;
+        if (currentUser.theme) {
+            form.theme.value = currentUser.theme;
+            applyTheme(currentUser.theme);
+        }
     }
 
     function applyTheme(theme) {
@@ -53,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (theme === 'colorful') {
             body.classList.add('bg-gradient-to-br', 'from-indigo-50', 'via-white', 'to-purple-50');
-            // Ensure dark text
             body.classList.remove('text-white');
         } else if (theme === 'light') {
             body.classList.add('bg-gray-50');

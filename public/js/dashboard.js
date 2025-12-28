@@ -1,22 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
     fetchDashboardData();
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser && currentUser.username) {
+        document.getElementById('userDisplay').textContent = currentUser.username;
+    }
 });
 
-async function fetchDashboardData() {
-    try {
-        const [expRes, incRes] = await Promise.all([
-            fetch('/expenses'),
-            fetch('/incomes')
-        ]);
+function fetchDashboardData() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) return;
 
-        const expenses = await expRes.json();
-        const incomes = await incRes.json();
+    const allExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+    const allIncomes = JSON.parse(localStorage.getItem('incomes') || '[]');
 
-        updateStats(expenses, incomes);
-        renderCharts(expenses, incomes);
-    } catch (err) {
-        console.error(err);
-    }
+    const expenses = allExpenses.filter(e => e.userId === currentUser.id);
+    const incomes = allIncomes.filter(i => i.userId === currentUser.id);
+
+    updateStats(expenses, incomes);
+    renderCharts(expenses, incomes);
 }
 
 function updateStats(expenses, incomes) {
@@ -53,7 +54,9 @@ function renderCharts(expenses, incomes) {
         categoryData[ex.category] = (categoryData[ex.category] || 0) + ex.amount;
     });
 
-    new Chart(categoryCtx, {
+    if (window.myPieChart) window.myPieChart.destroy();
+
+    window.myPieChart = new Chart(categoryCtx, {
         type: 'doughnut',
         data: {
             labels: Object.keys(categoryData),
@@ -95,7 +98,9 @@ function renderCharts(expenses, incomes) {
         }
     });
 
-    new Chart(monthlyCtx, {
+    if (window.myBarChart) window.myBarChart.destroy();
+
+    window.myBarChart = new Chart(monthlyCtx, {
         type: 'bar',
         data: {
             labels: months.map(m => {
@@ -123,5 +128,5 @@ function renderCharts(expenses, incomes) {
 }
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
 }

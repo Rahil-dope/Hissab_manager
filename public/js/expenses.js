@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let expenses = [];
     let categories = [];
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
     // Init
     loadCategories();
@@ -30,28 +31,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === expenseModal) closeModal();
     });
 
-    async function loadCategories() {
-        try {
-            const res = await fetch('/categories');
-            categories = await res.json();
-
-            // Populate Filters and Modal
-            const options = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-            categoryFilter.innerHTML = '<option value="">All Categories</option>' + options;
-            modalCategorySelect.innerHTML = options;
-        } catch (err) {
-            console.error('Failed to load categories', err);
+    function loadCategories() {
+        const storedCategories = localStorage.getItem(`categories_${currentUser.id}`);
+        categories = storedCategories ? JSON.parse(storedCategories) : [];
+        if (categories.length === 0) {
+            // Fallback default
+            categories = [{ id: 1, name: 'Food' }, { id: 2, name: 'Transport' }];
         }
+
+        const options = categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        categoryFilter.innerHTML = '<option value="">All Categories</option>' + options;
+        modalCategorySelect.innerHTML = options;
     }
 
-    async function loadExpenses() {
-        try {
-            const res = await fetch('/expenses'); // Fetch all for client-side filtering (simple app)
-            expenses = await res.json();
-            renderExpenses();
-        } catch (err) {
-            console.error('Failed to load expenses', err);
-        }
+    function loadExpenses() {
+        const allExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+        expenses = allExpenses.filter(e => e.userId === currentUser.id);
+        renderExpenses();
     }
 
     function renderExpenses() {
@@ -94,8 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="px-6 py-4 text-gray-900">${ex.note || '-'} ${ex.is_recurring ? '<span class="ml-2 text-xs text-blue-500">(Recurring)</span>' : ''}</td>
                 <td class="px-6 py-4 font-medium text-gray-900">₹${ex.amount}</td>
                 <td class="px-6 py-4 text-right">
-                    <button onclick="editExpense('${ex.id}')" class="text-blue-600 hover:text-blue-900 mr-3 opacity-0 group-hover:opacity-100 transition-opacity">Edit</button>
-                    <button onclick="deleteExpense('${ex.id}')" class="text-red-600 hover:text-red-900 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>
+                    <button onclick="editExpense(${ex.id})" class="text-blue-600 hover:text-blue-900 mr-3 opacity-0 group-hover:opacity-100 transition-opacity">Edit</button>
+                    <button onclick="deleteExpense(${ex.id})" class="text-red-600 hover:text-red-900 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>
                 </td>
             </tr>
         `).join('');
@@ -107,14 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(ex);
     };
 
-    window.deleteExpense = async (id) => {
+    window.deleteExpense = (id) => {
         if (!confirm('Are you sure you want to delete this expense?')) return;
-        try {
-            await fetch(`/expenses/${id}`, { method: 'DELETE' });
-            loadExpenses();
-        } catch (err) {
-            alert('Failed to delete expense');
-        }
+
+        const allExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+        const updatedExpenses = allExpenses.filter(e => e.id !== id);
+        localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
+        loadExpenses();
     };
 
     function openModal(editingExpense = null) {
@@ -125,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             expenseForm.amount.value = editingExpense.amount;
             expenseForm.category.value = editingExpense.category;
             expenseForm.date.value = editingExpense.date;
-            expenseForm.note.value = editingExpense.note;
+            expenseForm.note.value = editingExpense.note || '';
             expenseForm.is_recurring.checked = !!editingExpense.is_recurring;
         } else {
             modalTitle.textContent = 'Add Expense';
@@ -139,31 +134,34 @@ document.addEventListener('DOMContentLoaded', () => {
         expenseModal.classList.add('hidden');
     }
 
-    async function handleFormSubmit(e) {
+    function handleFormSubmit(e) {
         e.preventDefault();
         const formData = new FormData(expenseForm);
         const data = Object.fromEntries(formData.entries());
         data.is_recurring = expenseForm.is_recurring.checked;
+        data.amount = parseFloat(data.amount);
 
-        const id = data.id;
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? `/expenses/${id}` : '/expenses';
+        let allExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
 
-        try {
-            const res = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            if (res.ok) {
-                closeModal();
-                loadExpenses();
-            } else {
-                alert('Failed to save expense');
+        if (data.id) {
+            // Update
+            const id = parseInt(data.id);
+            const index = allExpenses.findIndex(e => e.id === id);
+            if (index !== -1) {
+                allExpenses[index] = { ...allExpenses[index], ...data, id: id, userId: currentUser.id };
             }
-        } catch (err) {
-            alert('Error saving expense');
+        } else {
+            // Create
+            const newExpense = {
+                ...data,
+                id: Date.now(),
+                userId: currentUser.id
+            };
+            allExpenses.push(newExpense);
         }
+
+        localStorage.setItem('expenses', JSON.stringify(allExpenses));
+        closeModal();
+        loadExpenses();
     }
 });
