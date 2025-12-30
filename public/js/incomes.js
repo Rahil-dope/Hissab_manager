@@ -4,36 +4,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const incomeModal = document.getElementById('incomeModal');
     const incomeForm = document.getElementById('incomeForm');
     const modalTitle = document.getElementById('modalTitle');
+    const addIncomeBtn = document.getElementById('addIncomeBtn');
+    const closeModalBtn = document.getElementById('closeModal');
+    const sortSelect = document.getElementById('sortSelect');
 
     let incomes = [];
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    let currentUser = null;
+
+    try {
+        currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    } catch (e) {
+        console.error('Error parsing currentUser:', e);
+    }
+
+    if (!currentUser) return; // Auth logic in app.js handles redirect
 
     // Init
     loadIncomes();
 
     // Event Listeners
-    document.getElementById('addIncomeBtn').addEventListener('click', () => openModal());
-    document.getElementById('closeModal').addEventListener('click', () => closeModal());
+    if (addIncomeBtn) {
+        addIncomeBtn.addEventListener('click', () => openModal());
+    } else {
+        console.error('Add Income Button not found!');
+    }
 
-    incomeForm.addEventListener('submit', handleFormSubmit);
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', () => closeModal());
+    }
 
-    // Sort listener
-    const sortSelect = document.getElementById('sortSelect');
+    if (incomeForm) {
+        incomeForm.addEventListener('submit', handleFormSubmit);
+    }
+
     if (sortSelect) sortSelect.addEventListener('change', renderIncomes);
 
-    incomeModal.addEventListener('click', (e) => {
-        if (e.target === incomeModal) closeModal();
-    });
+    if (incomeModal) {
+        incomeModal.addEventListener('click', (e) => {
+            if (e.target === incomeModal) closeModal();
+        });
+    }
 
     function loadIncomes() {
-        const allIncomes = JSON.parse(localStorage.getItem('incomes') || '[]');
-        incomes = allIncomes.filter(i => i.userId === currentUser.id);
-        renderIncomes();
+        try {
+            const allIncomes = JSON.parse(localStorage.getItem('incomes') || '[]');
+            incomes = allIncomes.filter(i => i.userId === currentUser.id);
+            renderIncomes();
+        } catch (e) {
+            console.error('Error loading incomes:', e);
+            incomes = [];
+            renderIncomes();
+        }
     }
 
     function renderIncomes() {
         // Simple client-side sorting if select exists
-        const sortMode = document.getElementById('sortSelect')?.value;
+        const sortMode = sortSelect?.value;
         let filtered = [...incomes];
 
         if (sortMode) {
@@ -47,28 +73,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (filtered.length === 0) {
-            incomesTableBody.innerHTML = '';
-            emptyState.classList.remove('hidden');
+            if (incomesTableBody) incomesTableBody.innerHTML = '';
+            if (emptyState) emptyState.classList.remove('hidden');
             return;
         }
 
-        emptyState.classList.add('hidden');
-        incomesTableBody.innerHTML = filtered.map(inc => `
-            <tr class="hover:bg-gray-50 transition-colors group">
-                <td class="px-6 py-4 whitespace-nowrap text-gray-500">${inc.date}</td>
-                <td class="px-6 py-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        ${inc.source}
-                    </span>
-                </td>
-                <td class="px-6 py-4 text-gray-900">${inc.note || '-'}</td>
-                <td class="px-6 py-4 font-medium text-green-600">+₹${inc.amount}</td>
-                <td class="px-6 py-4 text-right">
-                    <button onclick="editIncome(${inc.id})" class="text-blue-600 hover:text-blue-900 mr-3 opacity-0 group-hover:opacity-100 transition-opacity">Edit</button>
-                    <button onclick="deleteIncome(${inc.id})" class="text-red-600 hover:text-red-900 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>
-                </td>
-            </tr>
-        `).join('');
+        if (emptyState) emptyState.classList.add('hidden');
+
+        if (incomesTableBody) {
+            incomesTableBody.innerHTML = filtered.map(inc => `
+                <tr class="hover:bg-gray-50 transition-colors group">
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">${inc.date}</td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ${inc.source}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-gray-900">${inc.note || '-'}</td>
+                    <td class="px-6 py-4 font-medium text-green-600">+₹${parseFloat(inc.amount).toFixed(2)}</td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="editIncome(${inc.id})" class="text-blue-600 hover:text-blue-900 mr-3 opacity-0 group-hover:opacity-100 transition-opacity">Edit</button>
+                        <button onclick="deleteIncome(${inc.id})" class="text-red-600 hover:text-red-900 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        if (typeof feather !== 'undefined') feather.replace();
     }
 
     window.editIncome = (id) => {
@@ -87,10 +118,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function openModal(editingIncome = null) {
+        if (!incomeModal) return;
         incomeModal.classList.remove('hidden');
         if (editingIncome) {
             modalTitle.textContent = 'Edit Income';
             incomeForm.id.value = editingIncome.id;
+            // Handle float values correctly in input
             incomeForm.amount.value = editingIncome.amount;
             incomeForm.source.value = editingIncome.source;
             incomeForm.date.value = editingIncome.date;
@@ -104,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function closeModal() {
-        incomeModal.classList.add('hidden');
+        if (incomeModal) incomeModal.classList.add('hidden');
     }
 
     function handleFormSubmit(e) {

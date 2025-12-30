@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const categoriesList = document.getElementById('categoriesList');
+    const categoriesList = document.getElementById('categoryList');
     const categoryForm = document.getElementById('categoryForm');
 
     let categories = [];

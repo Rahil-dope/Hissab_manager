@@ -51,15 +51,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const body = document.body;
         // Reset classes
         body.classList.remove('bg-gradient-to-br', 'from-indigo-50', 'via-white', 'to-purple-50');
-        body.classList.remove('bg-gray-50');
+        body.classList.remove('from-indigo-100', 'via-purple-50', 'to-pink-100'); // New colorful classes
+        body.classList.remove('bg-gray-50', 'bg-white');
         body.classList.remove('bg-gray-900', 'text-white');
         document.documentElement.classList.remove('dark');
 
         if (theme === 'colorful') {
-            body.classList.add('bg-gradient-to-br', 'from-indigo-50', 'via-white', 'to-purple-50');
+            // More vibrant gradient
+            body.classList.add('bg-gradient-to-br', 'from-indigo-100', 'via-purple-50', 'to-pink-100');
             body.classList.remove('text-white');
         } else if (theme === 'light') {
-            body.classList.add('bg-gray-50');
+            // Clean white/gray
+            body.classList.add('bg-white'); // Changed from bg-gray-50 for more contrast
             body.classList.remove('text-white');
         } else if (theme === 'dark') {
             body.classList.add('bg-gray-900', 'text-white');

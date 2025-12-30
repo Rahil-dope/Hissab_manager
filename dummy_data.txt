@@ -1,0 +1,56 @@
+# Dummy Data for Testing Expense Tracker
+# Date Context: December 2025 (Use current month/year for best results)
+
+## 1. Categories
+Go to the "Categories" page and add these:
+- Housing
+- Food & Dining
+- Transportation
+- Entertainment
+- Health & Fitness
+- Shopping
+- Utilities
+- Education
+
+## 2. Incomes
+Go to the "Incomes" page and add these entries:
+
+| Date       | Source            | Amount   | Note                         |
+|------------|-------------------|----------|------------------------------|
+| 2025-12-01 | Main Salary       | 5000.00  | Monthly Salary               |
+| 2025-12-15 | Freelance Project | 1200.00  | Web Design Gig               |
+| 2025-12-25 | Christmas Gift    | 200.00   | Gift from family             |
+| 2025-12-28 | Dividends         | 50.00    | Stock market returns         |
+
+total Income: $6450.00
+
+## 3. Expenses
+Go to the "Expenses" page and add these to see vibrant charts:
+
+| Date       | Category       | Amount  | Note                            | Recurring? |
+|------------|----------------|---------|---------------------------------|------------|
+| 2025-12-01 | Housing        | 1200.00 | Monthly Rent                    | Yes        |
+| 2025-12-02 | Utilities      | 150.00  | Electricity & Water             | Yes        |
+| 2025-12-03 | Food & Dining  | 200.00  | Weekly Groceries                | No         |
+| 2025-12-05 | Entertainment  | 15.99   | Netflix Subscription            | Yes        |
+| 2025-12-08 | Transportation | 40.00   | Gas Refill                      | No         |
+| 2025-12-10 | Health         | 50.00   | Gym Membership                  | Yes        |
+| 2025-12-12 | Food & Dining  | 85.00   | Dinner at Italian Restaurant    | No         |
+| 2025-12-15 | Education      | 120.00  | Online Course (Udemy)           | No         |
+| 2025-12-18 | Shopping       | 300.00  | Winter Jacket                   | No         |
+| 2025-12-20 | Transportation | 25.00   | Uber rides                      | No         |
+| 2025-12-22 | Food & Dining  | 15.00   | Coffee & Snacks                 | No         |
+| 2025-12-24 | Entertainment  | 100.00  | Concert Tickets                 | No         |
+| 2025-12-26 | Health         | 30.00   | Pharmacy / Medicine             | No         |
+| 2025-12-30 | Food & Dining  | 250.00  | New Year Party Supplies         | No         |
+
+Total Expenses: $2,580.99
+
+## 4. Expected Results
+- **Net Balance**: $3,869.01 (Income - Expenses)
+- **Dashboard**: Should show a healthy Green balance card.
+- **Charts**:
+    - "Food & Dining" and "Housing" should be the largest slices in the pie chart.
+    - Expense trend line should show spikes on the 1st (Rent) and 18th/30th (Shopping/Party).
+- **Reports**:
+    - Monthly Report PDF should neatly categorize these and verify the totals.

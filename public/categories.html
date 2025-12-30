@@ -134,59 +134,9 @@
     </main>
 
     <script src="/js/app.js"></script>
+    <script src="/js/categories.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const list = document.getElementById('categoryList');
-            const form = document.getElementById('categoryForm');
-
-            loadCategories();
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = form.name.value;
-                try {
-                    const res = await fetch('/categories', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name })
-                    });
-                    if (res.ok) {
-                        form.reset();
-                        loadCategories();
-                    }
-                } catch (err) { alert('Error adding category'); }
-            });
-
-            async function loadCategories() {
-                try {
-                    const res = await fetch('/categories');
-                    const categories = await res.json();
-
-                    list.innerHTML = categories.map(cat => `
-                        <li class="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
-                            <span class="font-medium text-slate-900 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
-                                    <i data-feather="tag" class="w-4 h-4"></i>
-                                </div>
-                                ${cat.name}
-                            </span>
-                            <button onclick="deleteCategory(${cat.id})" class="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-xl hover:bg-red-50">
-                                <i data-feather="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </li>
-                    `).join('');
-                    feather.replace();
-                } catch (err) { }
-            }
-
-            window.deleteCategory = async (id) => {
-                if (!confirm('Delete this category?')) return;
-                try {
-                    await fetch(`/categories/${id}`, { method: 'DELETE' });
-                    loadCategories();
-                } catch (err) { alert('Error deleting category'); }
-            };
-        });
+        // Inline script removed to use public/js/categories.js for localStorage handling
     </script>
 </body>
 
