@@ -2,7 +2,6 @@
 
 A modern, full-stack expense tracking application designed for students. Manage your daily finances, track expenses, set budgets, and visualize your spending habits with a beautiful, responsive interface.
 
-![Expense Tracker Dashboard](https://instasize.com/p/37eb992d40d232aafdc70a8a13345aad634c5811f1ab57903ed4c8c981deaf67)
 
 ## ✨ Features
 
@@ -85,7 +84,3 @@ To run the full application (Frontend + Backend + DB), deploy to a platform that
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).
